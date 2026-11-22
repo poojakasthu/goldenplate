@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Golden Plate | Restaurant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="logo">The Golden Plate<span>.</span></div>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
+
+    <nav id="navbar">
+        <a href="#home">Home</a>
+        <a href="#menu">Our Menu</a>
+        <a href="#mood">Find Food</a>
+        <a href="#rewards">Rewards</a>
+        <a href="#about">About Us</a>
+        <a href="#reservation">Reservation</a>
+        <a href="#contact">Contact</a>
+    </nav>
+
+    <button class="header-btn" id="cartOpen">
+        🛒 Cart (<span id="cartCount">0</span>)
+    </button>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="home">
+    <div class="hero-content">
+        <p class="small-heading">WELCOME TO THE GOLDEN PLATE</p>
+        <h1>Good Food.<br>Great Memories.</h1>
+        <p class="hero-text">
+            Discover delicious flavours, freshly prepared meals
+            and a dining experience made with love.
+        </p>
+        <a href="#menu" class="main-btn">Explore Menu</a>
+        <a href="#mood" class="main-btn secondary-btn">Find My Food</a>
+    </div>
+</section>
+
+<!-- MOOD RECOMMENDER -->
+<section class="unique-section" id="mood">
+    <div class="section-heading">
+        <p class="small-heading">FOOD MEETS YOUR MOOD</p>
+        <h2>What's Your Mood Today?</h2>
+        <p>Tell us how you feel. We'll find something delicious for you.</p>
+    </div>
+
+    <div class="mood-grid">
+        <button class="mood-btn" data-mood="happy">
+            <span>😄</span>
+            Happy
+        </button>
+        <button class="mood-btn" data-mood="hungry">
+            <span>🤤</span>
+            Super Hungry
+        </button>
+        <button class="mood-btn" data-mood="stressed">
+            <span>😌</span>
+            Need Comfort
+        </button>
+        <button class="mood-btn" data-mood="sweet">
+            <span>🍫</span>
+            Sweet Craving
+        </button>
+    </div>
+
+    <div class="recommendation-box" id="moodResult" aria-live="polite">
+        <p>✨ Choose your mood to discover your perfect food!</p>
+    </div>
+</section>
+
+<!-- SECRET DISH -->
+<section class="secret-section">
+    <div class="secret-content">
+        <p class="small-heading">A SURPRISE FROM OUR CHEF</p>
+        <h2>Today's Secret Dish 🤫</h2>
+        <p>Our chef has prepared something special just for you.</p>
+        <button class="main-btn" id="revealSecret">Reveal Secret Dish</button>
+        <div id="secretResult" class="secret-result" aria-live="polite"></div>
+    </div>
+</section>
+
+<!-- MENU -->
+<section class="menu-section" id="menu">
+    <div class="section-heading">
+        <p class="small-heading">FRESH FROM OUR KITCHEN</p>
+        <h2>Our Popular Dishes</h2>
+        <p>Made with fresh ingredients and served with love.</p>
+    </div>
+
+    <div class="menu-tools">
+        <input type="search" id="foodSearch"
+            placeholder="Search your favourite food...">
+    </div>
+
+    <div class="category-buttons">
+        <button class="category-btn active" data-category="All">All</button>
+        <button class="category-btn" data-category="Chef's Special">Chef's Special</button>
+        <button class="category-btn" data-category="South Indian">South Indian</button>
+        <button class="category-btn" data-category="Vegetarian">Vegetarian</button>
+        <button class="category-btn" data-category="Italian Favourite">Italian</button>
+        <button class="category-btn" data-category="Dessert">Desserts</button>
+    </div>
+
+    <div class="menu-container" id="menuContainer">
+
+        <div class="food-card" data-category="Chef's Special" data-name="Chicken Biryani">
+            <img src="https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=700&q=85" alt="Chicken Biryani">
+            <div class="food-info">
+                <p class="food-category">CHEF'S SPECIAL</p>
+                <h3>Chicken Biryani</h3>
+                <p class="description">Fragrant basmati rice cooked with tender chicken and traditional Indian spices.</p>
+                <div class="food-bottom">
+                    <span class="price">₹220</span>
+                    <button class="order-btn customize-btn" data-name="Chicken Biryani" data-price="220">Customize</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="food-card" data-category="South Indian" data-name="Masala Dosa">
+            <img src="https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=700&q=85" alt="Masala Dosa">
+            <div class="food-info">
+                <p class="food-category">SOUTH INDIAN</p>
+                <h3>Masala Dosa</h3>
+                <p class="description">Golden crispy dosa filled with spiced potato masala, served with chutney and sambar.</p>
+                <div class="food-bottom">
+                    <span class="price">₹120</span>
+                    <button class="order-btn customize-btn" data-name="Masala Dosa" data-price="120">Customize</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="food-card" data-category="Vegetarian" data-name="Paneer Butter Masala">
+            <img src="https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=700&q=85" alt="Paneer Butter Masala">
+            <div class="food-info">
+                <p class="food-category">VEGETARIAN</p>
+                <h3>Paneer Butter Masala</h3>
+                <p class="description">Soft paneer pieces in a creamy tomato gravy with a rich blend of Indian spices.</p>
+                <div class="food-bottom">
+                    <span class="price">₹180</span>
+                    <button class="order-btn customize-btn" data-name="Paneer Butter Masala" data-price="180">Customize</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="food-card" data-category="Dessert" data-name="Chocolate Brownie">
+            <img src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=700&q=85" alt="Chocolate Brownie">
+            <div class="food-info">
+                <p class="food-category">SWEET TREATS</p>
+                <h3>Chocolate Brownie</h3>
+                <p class="description">A rich, fudgy chocolate brownie for the perfect ending to your meal.</p>
+                <div class="food-bottom">
+                    <span class="price">₹90</span>
+                    <button class="order-btn customize-btn" data-name="Chocolate Brownie" data-price="90">Customize</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="food-card" data-category="Italian Favourite" data-name="Cheesy Pizza">
+            <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=700&q=85" alt="Cheesy Pizza">
+            <div class="food-info">
+                <p class="food-category">ITALIAN FAVOURITE</p>
+                <h3>Cheesy Pizza</h3>
+                <p class="description">Freshly baked pizza topped with cheese, tomato sauce and aromatic herbs.</p>
+                <div class="food-bottom">
+                    <span class="price">₹250</span>
+                    <button class="order-btn customize-btn" data-name="Cheesy Pizza" data-price="250">Customize</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="food-card" data-category="Dessert" data-name="Icecream">
+            <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=700&q=85" alt="Icecream">
+            <div class="food-info">
+                <p class="food-category">DESSERT</p>
+                <h3>Icecream</h3>
+                <p class="description">Creamy, delicious ice cream made with rich flavours to sweeten every moment.</p>
+                <div class="food-bottom">
+                    <span class="price">₹80</span>
+                    <button class="order-btn customize-btn" data-name="Icecream" data-price="80">Customize</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <p id="noResults" class="no-results" hidden>No food items found!</p>
+</section>
+
+<!-- FOOD COMBO FINDER -->
+<section class="unique-section combo-section" id="combo">
+    <div class="section-heading">
+        <p class="small-heading">A PERFECT MATCH</p>
+        <h2>Find Your Perfect Food Combo</h2>
+        <p>Select your favourite main dish. We'll suggest a delicious combination.</p>
+    </div>
+
+    <div class="combo-box">
+        <label for="comboSelect">Choose your main dish</label>
+        <select id="comboSelect">
+            <option value="">Select a dish</option>
+            <option value="Chicken Biryani">Chicken Biryani</option>
+            <option value="Masala Dosa">Masala Dosa</option>
+            <option value="Paneer Butter Masala">Paneer Butter Masala</option>
+            <option value="Cheesy Pizza">Cheesy Pizza</option>
+        </select>
+
+        <button class="main-btn" id="findCombo">Find My Combo</button>
+
+        <div id="comboResult" class="combo-result" aria-live="polite">
+            <p>Your delicious combo will appear here!</p>
+        </div>
+    </div>
+</section>
+
+<!-- SPIN AND WIN -->
+<section class="spin-section">
+    <div class="section-heading">
+        <p class="small-heading">A LITTLE EXTRA FUN</p>
+        <h2>Spin & Win 🎁</h2>
+        <p>Try your luck and unlock a surprise reward!</p>
+    </div>
+
+    <div class="spin-container">
+        <div class="wheel-wrapper">
+            <div class="wheel-pointer">▼</div>
+            <div class="wheel" id="wheel">
+                <span class="wheel-label label-1">5% OFF</span>
+                <span class="wheel-label label-2">10% OFF</span>
+                <span class="wheel-label label-3">Try Again</span>
+                <span class="wheel-label label-4">FREE DESSERT</span>
+                <span class="wheel-label label-5">₹50 OFF</span>
+                <span class="wheel-label label-6">15% OFF</span>
+            </div>
+        </div>
+
+        <button class="main-btn spin-btn" id="spinButton">SPIN NOW</button>
+
+        <p id="spinResult" class="spin-result" aria-live="polite">
+            Your lucky reward is waiting!
+        </p>
+        <p class="spin-note">Demo rewards only. One spin per day.</p>
+    </div>
+</section>
+
+<!-- GOLDEN REWARDS -->
+<section class="rewards-section" id="rewards">
+    <div class="section-heading">
+        <p class="small-heading">LOYALTY HAS ITS REWARDS</p>
+        <h2>Golden Rewards Club ✨</h2>
+        <p>Every order brings you closer to something special.</p>
+    </div>
+
+    <div class="rewards-card">
+        <div class="reward-icon">🏆</div>
+        <p class="reward-label">YOUR GOLDEN POINTS</p>
+        <h2><span id="rewardPoints">0</span> Points</h2>
+        <p id="rewardLevel">Golden Beginner</p>
+
+        <div class="points-progress">
+            <div id="pointsProgress"></div>
+        </div>
+
+        <p id="pointsMessage">Earn points by placing demo orders!</p>
+
+        <div class="reward-rules">
+            <div>
+                <strong>10 Points</strong>
+                <span>For every ₹100 spent</span>
+            </div>
+            <div>
+                <strong>100 Points</strong>
+                <span>Redeem for ₹50 demo reward</span>
+            </div>
+        </div>
+
+        <button class="main-btn" id="redeemPoints">Redeem 100 Points</button>
+    </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-section" id="about">
+    <div class="about-image">
+        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1000&q=85" alt="Restaurant interior">
+    </div>
+
+    <div class="about-content">
+        <p class="small-heading">A LITTLE ABOUT US</p>
+        <h2>More Than Just A Meal</h2>
+        <p>
+            At The Golden Plate, we believe that great food
+            brings people together. Every dish is prepared
+            with fresh ingredients, traditional flavours and
+            a passion for good cooking.
+        </p>
+        <p>
+            Whether you're sharing a meal with family,
+            catching up with friends or celebrating a special
+            occasion, we're here to make it memorable.
+        </p>
+        <a href="#contact" class="main-btn">Visit Us Today</a>
+    </div>
+</section>
+
+<!-- RESERVATION -->
+<section class="reservation-section" id="reservation">
+    <div class="section-heading">
+        <p class="small-heading">BOOK YOUR TABLE</p>
+        <h2>Make A Reservation</h2>
+        <p>We are waiting to serve you!</p>
+    </div>
+
+    <form id="reservationForm" class="reservation-form">
+        <label for="customerName">Full Name</label>
+        <input type="text" id="customerName" placeholder="Enter your name" required>
+
+        <label for="customerEmail">Email Address</label>
+        <input type="email" id="customerEmail" placeholder="Enter your email" required>
+
+        <label for="bookingDate">Date</label>
+        <input type="date" id="bookingDate" required>
+
+        <label for="bookingTime">Time</label>
+        <select id="bookingTime" required>
+            <option value="">Select Time</option>
+            <option>11:00 AM</option>
+            <option>12:00 PM</option>
+            <option>01:00 PM</option>
+            <option>02:00 PM</option>
+            <option>06:00 PM</option>
+            <option>07:00 PM</option>
+            <option>08:00 PM</option>
+            <option>09:00 PM</option>
+        </select>
+
+        <label for="guests">Number of Guests</label>
+        <select id="guests" required>
+            <option value="">Select Guests</option>
+            <option value="1">1 Person</option>
+            <option value="2">2 People</option>
+            <option value="3">3 People</option>
+            <option value="4">4 People</option>
+            <option value="5">5 People</option>
+            <option value="6">6 People</option>
+        </select>
+
+        <button type="submit" class="main-btn">Confirm Reservation</button>
+    </form>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+    <div class="section-heading">
+        <p class="small-heading">WE'D LOVE TO SEE YOU</p>
+        <h2>Visit Our Restaurant</h2>
+        <p>Good food is always worth coming back for.</p>
+    </div>
+
+    <div class="contact-container">
+        <div class="contact-card">
+            <span class="contact-icon">☎</span>
+            <h3>Call Us</h3>
+            <p>+91 9867452310</p>
+        </div>
+
+        <div class="contact-card">
+            <span class="contact-icon">⌖</span>
+            <h3>Our Location</h3>
+            <p>123 Main Road, Tenkasi, Tamil Nadu</p>
+        </div>
+
+        <div class="contact-card">
+            <span class="contact-icon">◷</span>
+            <h3>Opening Hours</h3>
+            <p>Every day: 11 AM – 10 PM</p>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-content">
+        <div class="logo">The Golden Plate<span>.</span></div>
+        <p>Bringing People Together Through Food.</p>
+        <div class="footer-links">
+            <a href="#home">Home</a>
+            <a href="#menu">Menu</a>
+            <a href="#mood">Find Food</a>
+            <a href="#rewards">Rewards</a>
+            <a href="#contact">Contact</a>
+        </div>
+        <p class="copyright">© 2026 The Golden Plate. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- CUSTOMIZATION MODAL -->
+<div class="modal-overlay" id="customModal">
+    <div class="custom-modal">
+        <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+        <p class="small-heading">MAKE IT YOUR WAY</p>
+        <h2 id="customFoodName">Customize Dish</h2>
+        <p>Choose your preferences.</p>
+
+        <label for="spiceLevel">Spice Level</label>
+        <select id="spiceLevel">
+            <option value="Mild">Mild</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="Spicy">Spicy</option>
+            <option value="Extra Spicy">Extra Spicy</option>
+        </select>
+
+        <p class="custom-label">Extra Add-ons</p>
+        <label class="addon-option">
+            <input type="checkbox" class="addon" value="Extra Cheese" data-price="30">
+            Extra Cheese (+₹30)
+        </label>
+        <label class="addon-option">
+            <input type="checkbox" class="addon" value="Extra Toppings" data-price="25">
+            Extra Toppings (+₹25)
+        </label>
+        <label class="addon-option">
+            <input type="checkbox" class="addon" value="Extra Portion" data-price="40">
+            Extra Portion (+₹40)
+        </label>
+
+        <div class="custom-total">
+            Total: <span id="customTotal">₹0</span>
+        </div>
+
+        <button class="main-btn" id="addCustomized">Add Customized Dish</button>
+    </div>
+</div>
+
+<!-- CART -->
+<div class="cart-overlay" id="cartOverlay"></div>
+
+<aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+        <h2>Your Cart 🛒</h2>
+        <button id="cartClose" class="close-btn" aria-label="Close cart">✕</button>
+    </div>
+
+    <div id="cartItems" class="cart-items">
+        <p class="empty-cart">Your cart is empty!</p>
+    </div>
+
+    <div class="cart-footer">
+        <h3>Total: <span id="cartTotal">₹0</span></h3>
+        <button id="checkoutBtn" class="main-btn">Place Order</button>
+    </div>
+</aside>
+
+<!-- TOAST -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- BACK TO TOP -->
+<button id="backToTop" aria-label="Back to top">↑</button>
+
+<script src="app.js"></script>
+</body>
+</html>
