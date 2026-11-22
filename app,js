@@ -1,0 +1,1136 @@
+
+// ==========================================
+// THE GOLDEN PLATE - COMPLETE JAVASCRIPT
+// ==========================================
+
+
+// 1. SELECT ELEMENTS
+
+const menuToggle = document.getElementById("menuToggle");
+const navbar = document.getElementById("navbar");
+
+const foodSearch = document.getElementById("foodSearch");
+const foodCards = document.querySelectorAll(".food-card");
+const categoryButtons = document.querySelectorAll(".category-btn");
+const noResults = document.getElementById("noResults");
+
+const cartOpen = document.getElementById("cartOpen");
+const cartClose = document.getElementById("cartClose");
+const cartSidebar = document.getElementById("cartSidebar");
+const cartOverlay = document.getElementById("cartOverlay");
+
+const cartItems = document.getElementById("cartItems");
+const cartCount = document.getElementById("cartCount");
+const cartTotal = document.getElementById("cartTotal");
+const checkoutBtn = document.getElementById("checkoutBtn");
+
+const toast = document.getElementById("toast");
+const backToTop = document.getElementById("backToTop");
+
+
+// 2. DATA
+
+const foods = {
+    "Chicken Biryani": 220,
+    "Masala Dosa": 120,
+    "Paneer Butter Masala": 180,
+    "Chocolate Brownie": 90,
+    "Cheesy Pizza": 250,
+    "Icecream": 80
+};
+
+let cart = [];
+
+
+// 3. LOCAL STORAGE
+
+function getSavedNumber(key) {
+    const value = Number(localStorage.getItem(key));
+    return Number.isFinite(value) && value >= 0 ? value : 0;
+}
+
+let rewardPoints = getSavedNumber("goldenPoints");
+
+let walletDiscount = getSavedNumber("goldenDiscount");
+
+let spinDate = localStorage.getItem("goldenSpinDate") || "";
+
+let spinDiscount = getSavedNumber("goldenSpinDiscount");
+
+function saveRewards() {
+    localStorage.setItem("goldenPoints", rewardPoints);
+    localStorage.setItem("goldenDiscount", walletDiscount);
+    localStorage.setItem("goldenSpinDate", spinDate);
+    localStorage.setItem("goldenSpinDiscount", spinDiscount);
+}
+
+
+// 4. TOAST NOTIFICATION
+
+let toastTimer;
+
+function showToast(message) {
+
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500);
+
+}
+
+
+// 5. MOBILE NAVIGATION
+
+menuToggle.addEventListener("click", () => {
+
+    navbar.classList.toggle("show");
+
+    menuToggle.textContent =
+        navbar.classList.contains("show") ? "✕" : "☰";
+
+});
+
+navbar.querySelectorAll("a").forEach(link => {
+
+    link.addEventListener("click", () => {
+
+        navbar.classList.remove("show");
+        menuToggle.textContent = "☰";
+
+    });
+
+});
+
+
+// 6. FOOD SEARCH AND FILTER
+
+let selectedCategory = "All";
+
+function filterFoods() {
+
+    const searchText = foodSearch.value.toLowerCase().trim();
+
+    let visibleCount = 0;
+
+    foodCards.forEach(card => {
+
+        const name = card.dataset.name.toLowerCase();
+
+        const category = card.dataset.category;
+
+        const matchesSearch = name.includes(searchText);
+
+        const matchesCategory =
+            selectedCategory === "All" ||
+            category === selectedCategory;
+
+        if (matchesSearch && matchesCategory) {
+
+            card.style.display = "";
+            visibleCount++;
+
+        } else {
+
+            card.style.display = "none";
+
+        }
+
+    });
+
+    noResults.hidden = visibleCount !== 0;
+
+}
+
+foodSearch.addEventListener("input", filterFoods);
+
+categoryButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        categoryButtons.forEach(btn => {
+            btn.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+        selectedCategory = button.dataset.category;
+
+        filterFoods();
+
+    });
+
+});
+
+
+// 7. SHOPPING CART
+
+function addToCart(name, price, options = "Regular") {
+
+    const existingItem = cart.find(item =>
+        item.name === name && item.options === options
+    );
+
+    if (existingItem) {
+
+        existingItem.quantity++;
+
+    } else {
+
+        cart.push({
+            name,
+            price,
+            options,
+            quantity: 1
+        });
+
+    }
+
+    updateCart();
+
+    showToast(name + " added to cart!");
+
+}
+
+
+function updateCart() {
+
+    cartItems.innerHTML = "";
+
+    let total = 0;
+    let totalQuantity = 0;
+
+    if (cart.length === 0) {
+
+        cartItems.innerHTML =
+            '<p class="empty-cart">Your cart is empty!</p>';
+
+    }
+
+    cart.forEach(item => {
+
+        const itemTotal = item.price * item.quantity;
+
+        total += itemTotal;
+
+        totalQuantity += item.quantity;
+
+
+        const div = document.createElement("div");
+        div.className = "cart-item";
+
+        const details = document.createElement("div");
+
+        const name = document.createElement("h4");
+        name.textContent = item.name;
+
+        const options = document.createElement("p");
+        options.textContent =
+            item.options === "Regular" ? "" : item.options;
+
+        const price = document.createElement("p");
+        price.textContent = `₹${itemTotal}`;
+
+        const controls = document.createElement("div");
+        controls.className = "quantity-controls";
+
+        const decrease = document.createElement("button");
+        decrease.textContent = "-";
+        decrease.setAttribute("aria-label", "Decrease quantity");
+
+        decrease.addEventListener("click", () => {
+            changeQuantity(item, -1);
+        });
+
+        const quantity = document.createElement("span");
+        quantity.textContent = item.quantity;
+
+        const increase = document.createElement("button");
+        increase.textContent = "+";
+        increase.setAttribute("aria-label", "Increase quantity");
+
+        increase.addEventListener("click", () => {
+            changeQuantity(item, 1);
+        });
+
+        controls.append(decrease, quantity, increase);
+
+        details.append(name, options, price, controls);
+
+        const remove = document.createElement("button");
+        remove.className = "remove-btn";
+        remove.textContent = "Remove";
+
+        remove.addEventListener("click", () => {
+            removeItem(item);
+        });
+
+        div.append(details, remove);
+
+        cartItems.appendChild(div);
+
+    });
+
+
+    cartCount.textContent = totalQuantity;
+    cartTotal.textContent = `₹${total}`;
+
+    checkoutBtn.disabled = cart.length === 0;
+
+    checkoutBtn.style.opacity =
+        cart.length === 0 ? "0.5" : "1";
+
+}
+
+
+// 8. ADD NORMAL FOOD
+
+document.querySelectorAll(".customize-btn").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        openCustomize(
+            button.dataset.name,
+            Number(button.dataset.price)
+        );
+
+    });
+
+});
+
+
+// 9. CHANGE QUANTITY
+
+function changeQuantity(item, amount) {
+
+    item.quantity += amount;
+
+    if (item.quantity <= 0) {
+
+        cart = cart.filter(cartItem => cartItem !== item);
+
+    }
+
+    updateCart();
+
+}
+
+
+// 10. REMOVE ITEM
+
+function removeItem(item) {
+
+    cart = cart.filter(cartItem => cartItem !== item);
+
+    updateCart();
+
+    showToast("Item removed from cart!");
+
+}
+
+
+// 11. CART OPEN AND CLOSE
+
+function openCart() {
+
+    cartSidebar.classList.add("show");
+    cartOverlay.classList.add("show");
+
+    document.body.classList.add("cart-open");
+
+}
+
+function closeCart() {
+
+    cartSidebar.classList.remove("show");
+    cartOverlay.classList.remove("show");
+
+    document.body.classList.remove("cart-open");
+
+}
+
+cartOpen.addEventListener("click", openCart);
+cartClose.addEventListener("click", closeCart);
+cartOverlay.addEventListener("click", closeCart);
+
+document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape") {
+
+        closeCart();
+        closeCustomize();
+
+    }
+
+});
+
+
+// 12. MOOD BASED FOOD RECOMMENDER
+
+const moodRecommendations = {
+
+    happy: {
+        name: "Cheesy Pizza",
+        description: "Celebrate your happy mood with a delicious cheesy pizza!",
+        emoji: "🍕"
+    },
+
+    hungry: {
+        name: "Chicken Biryani",
+        description: "Aromatic chicken biryani is perfect for your big appetite!",
+        emoji: "🍗"
+    },
+
+    stressed: {
+        name: "Masala Dosa",
+        description: "Enjoy a warm and comforting South Indian classic!",
+        emoji: "🥞"
+    },
+
+    sweet: {
+        name: "Chocolate Brownie",
+        description: "Make your day sweeter with a rich chocolate brownie!",
+        emoji: "🍫"
+    }
+
+};
+
+
+const moodButtons = document.querySelectorAll(".mood-btn");
+
+const moodResult = document.getElementById("moodResult");
+
+moodButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        moodButtons.forEach(btn => {
+            btn.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+        const mood = button.dataset.mood;
+
+        const food = moodRecommendations[mood];
+
+        moodResult.innerHTML = `
+            <h3>${food.emoji} ${food.name}</h3>
+            <p>${food.description}</p>
+            <button class="main-btn" id="moodAdd">
+                Add to Cart - ₹${foods[food.name]}
+            </button>
+        `;
+
+        document.getElementById("moodAdd").addEventListener("click", () => {
+
+            addToCart(food.name, foods[food.name]);
+
+        });
+
+    });
+
+});
+
+
+// 13. SECRET CHEF'S SPECIAL
+
+const secretDishes = [
+
+    {
+        name: "Royal Chicken Biryani",
+        description: "A special biryani surprise prepared with aromatic spices."
+    },
+
+    {
+        name: "Golden Cheese Pizza",
+        description: "A delicious pizza surprise with extra cheesy goodness."
+    },
+
+    {
+        name: "Chocolate Delight",
+        description: "A special sweet treat for chocolate lovers."
+    }
+
+];
+
+const revealSecret = document.getElementById("revealSecret");
+
+const secretResult = document.getElementById("secretResult");
+
+let secretRevealed = false;
+
+revealSecret.addEventListener("click", () => {
+
+    if (secretRevealed) {
+
+        showToast("Today's secret dish has already been revealed!");
+
+        return;
+
+    }
+
+    secretRevealed = true;
+
+    const secret = secretDishes[
+        Math.floor(Math.random() * secretDishes.length)
+    ];
+
+    secretResult.innerHTML = `
+        <h3>✨ ${secret.name}</h3>
+        <p>${secret.description}</p>
+        <p>Ask our restaurant for today's special!</p>
+    `;
+
+    revealSecret.textContent = "Secret Revealed!";
+
+});
+
+
+// 14. PERFECT FOOD COMBO FINDER
+
+const comboSelect = document.getElementById("comboSelect");
+
+const findCombo = document.getElementById("findCombo");
+
+const comboResult = document.getElementById("comboResult");
+
+
+const combos = {
+
+    "Chicken Biryani": {
+        side: "Fresh Orange Juice",
+        sidePrice: 70,
+        dessert: "Icecream",
+        dessertPrice: 80
+    },
+
+    "Masala Dosa": {
+        side: "Fresh Orange Juice",
+        sidePrice: 70,
+        dessert: "Chocolate Brownie",
+        dessertPrice: 90
+    },
+
+    "Paneer Butter Masala": {
+        side: "Masala Dosa",
+        sidePrice: 120,
+        dessert: "Icecream",
+        dessertPrice: 80
+    },
+
+    "Cheesy Pizza": {
+        side: "Fresh Orange Juice",
+        sidePrice: 70,
+        dessert: "Chocolate Brownie",
+        dessertPrice: 90
+    }
+
+};
+
+
+findCombo.addEventListener("click", () => {
+
+    const selectedFood = comboSelect.value;
+
+    if (!selectedFood) {
+
+        showToast("Please select a main dish!");
+
+        return;
+
+    }
+
+    const combo = combos[selectedFood];
+
+    const total =
+        foods[selectedFood] +
+        combo.sidePrice +
+        combo.dessertPrice;
+
+    comboResult.innerHTML = `
+        <h3>🍽️ Your Perfect Combo</h3>
+        <p>Main: ${selectedFood} - ₹${foods[selectedFood]}</p>
+        <p>Side: ${combo.side} - ₹${combo.sidePrice}</p>
+        <p>Dessert: ${combo.dessert} - ₹${combo.dessertPrice}</p>
+        <h3>Total: ₹${total}</h3>
+        <button class="main-btn" id="addCombo">Add Complete Combo</button>
+    `;
+
+    document.getElementById("addCombo").addEventListener("click", () => {
+
+        addToCart(selectedFood, foods[selectedFood]);
+
+        addToCart(combo.side, combo.sidePrice);
+
+        addToCart(combo.dessert, combo.dessertPrice);
+
+        showToast("Your complete combo has been added!");
+
+    });
+
+});
+
+
+// 15. CUSTOMIZE YOUR DISH
+
+const customModal = document.getElementById("customModal");
+
+const modalClose = document.getElementById("modalClose");
+
+const customFoodName = document.getElementById("customFoodName");
+
+const spiceLevel = document.getElementById("spiceLevel");
+
+const customTotal = document.getElementById("customTotal");
+
+const addonCheckboxes = document.querySelectorAll(".addon");
+
+const addCustomized = document.getElementById("addCustomized");
+
+let currentFood = "";
+
+let currentPrice = 0;
+
+
+function openCustomize(name, price) {
+
+    currentFood = name;
+    currentPrice = price;
+
+    customFoodName.textContent = name;
+
+    spiceLevel.value = "Medium";
+
+    addonCheckboxes.forEach(addon => {
+        addon.checked = false;
+    });
+
+    updateCustomTotal();
+
+    customModal.classList.add("show");
+
+    document.body.classList.add("cart-open");
+
+}
+
+
+function closeCustomize() {
+
+    customModal.classList.remove("show");
+
+    document.body.classList.remove("cart-open");
+
+}
+
+
+modalClose.addEventListener("click", closeCustomize);
+
+customModal.addEventListener("click", event => {
+
+    if (event.target === customModal) {
+
+        closeCustomize();
+
+    }
+
+});
+
+
+function updateCustomTotal() {
+
+    let total = currentPrice;
+
+    addonCheckboxes.forEach(addon => {
+
+        if (addon.checked) {
+
+            total += Number(addon.dataset.price);
+
+        }
+
+    });
+
+    customTotal.textContent = `₹${total}`;
+
+}
+
+
+addonCheckboxes.forEach(addon => {
+
+    addon.addEventListener("change", updateCustomTotal);
+
+});
+
+
+addCustomized.addEventListener("click", () => {
+
+    const selectedAddons = [];
+
+    let total = currentPrice;
+
+    addonCheckboxes.forEach(addon => {
+
+        if (addon.checked) {
+
+            selectedAddons.push(addon.value);
+
+            total += Number(addon.dataset.price);
+
+        }
+
+    });
+
+    const spice = spiceLevel.value;
+
+    const options = [
+        "Spice: " + spice,
+        ...selectedAddons
+    ].join(", ");
+
+    addToCart(currentFood, total, options);
+
+    closeCustomize();
+
+});
+
+
+// 16. SPIN AND WIN
+
+const wheel = document.getElementById("wheel");
+
+const spinButton = document.getElementById("spinButton");
+
+const spinResult = document.getElementById("spinResult");
+
+
+const prizes = [
+
+    { name: "5% OFF", discount: 5 },
+
+    { name: "10% OFF", discount: 10 },
+
+    { name: "Try Again", discount: 0 },
+
+    { name: "FREE DESSERT", discount: 0 },
+
+    { name: "₹50 OFF", discount: 50 },
+
+    { name: "15% OFF", discount: 15 }
+
+];
+
+
+function checkSpinStatus() {
+
+    const today = new Date().toLocaleDateString("en-CA");
+
+    const alreadySpun = spinDate === today;
+
+    spinButton.disabled = alreadySpun;
+
+    spinButton.textContent = alreadySpun
+        ? "COME BACK TOMORROW"
+        : "SPIN NOW";
+
+    if (alreadySpun) {
+
+        spinResult.textContent =
+            "You have already used today's spin!";
+
+    }
+
+}
+
+
+let isSpinning = false;
+
+let currentRotation = 0;
+
+spinButton.addEventListener("click", () => {
+
+    if (isSpinning) return;
+
+    const today = new Date().toLocaleDateString("en-CA");
+
+    if (spinDate === today) {
+
+        showToast("You have already spun today!");
+
+        return;
+
+    }
+
+    isSpinning = true;
+
+    spinButton.disabled = true;
+
+    spinButton.textContent = "SPINNING...";
+
+    const prizeIndex = Math.floor(Math.random() * prizes.length);
+
+    const prize = prizes[prizeIndex];
+
+    // Each segment is 60 degrees.
+    // Align the selected segment with the top pointer.
+
+    const segmentCenter = prizeIndex * 60 + 30;
+
+    const finalAngle = 360 - segmentCenter;
+
+    const extraSpins = 6 * 360;
+
+    currentRotation += extraSpins +
+        ((finalAngle - currentRotation % 360 + 360) % 360);
+
+    wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+    setTimeout(() => {
+
+        spinDate = today;
+
+        spinDiscount = Math.max(spinDiscount, prize.discount);
+
+        saveRewards();
+
+        isSpinning = false;
+
+        checkSpinStatus();
+
+        if (prize.name === "Try Again") {
+
+            spinResult.textContent =
+                "😅 Better luck next time!";
+
+        } else if (prize.name === "FREE DESSERT") {
+
+            spinResult.textContent =
+                "🎉 You won a FREE DESSERT! Ask us to redeem your demo prize.";
+
+        } else {
+
+            spinResult.textContent =
+                `🎉 Congratulations! You won ${prize.name}!`;
+
+        }
+
+        if (prize.discount > 0) {
+
+            showToast(prize.name + " reward unlocked!");
+
+        }
+
+    }, 4200);
+
+});
+
+
+// 17. GOLDEN REWARDS DISPLAY
+
+const rewardPointsDisplay =
+    document.getElementById("rewardPoints");
+
+const rewardLevel =
+    document.getElementById("rewardLevel");
+
+const pointsProgress =
+    document.getElementById("pointsProgress");
+
+const pointsMessage =
+    document.getElementById("pointsMessage");
+
+
+function updateRewards() {
+
+    rewardPointsDisplay.textContent = rewardPoints;
+
+    let level = "Golden Beginner";
+
+    if (rewardPoints >= 500) {
+
+        level = "👑 Golden Legend";
+
+    } else if (rewardPoints >= 200) {
+
+        level = "🥇 Golden Champion";
+
+    } else if (rewardPoints >= 100) {
+
+        level = "⭐ Golden Member";
+
+    }
+
+    rewardLevel.textContent = level;
+
+    const progress = rewardPoints % 100;
+
+    pointsProgress.style.width = progress + "%";
+
+    const remaining = 100 - progress;
+
+    pointsMessage.textContent =
+        remaining + " more points to your next 100-point milestone!";
+
+    saveRewards();
+
+}
+
+
+// 18. REDEEM GOLDEN POINTS
+
+const redeemPoints = document.getElementById("redeemPoints");
+
+redeemPoints.addEventListener("click", () => {
+
+    if (rewardPoints < 100) {
+
+        showToast("You need 100 points to redeem!");
+
+        return;
+
+    }
+
+    rewardPoints -= 100;
+
+    walletDiscount += 50;
+
+    updateRewards();
+
+    showToast("₹50 demo reward added to your wallet!");
+
+});
+
+
+// 19. CHECKOUT AND EARN POINTS
+
+checkoutBtn.addEventListener("click", () => {
+
+    if (cart.length === 0) {
+
+        showToast("Your cart is empty!");
+
+        return;
+
+    }
+
+    const subtotal = cart.reduce((sum, item) => {
+
+        return sum + item.price * item.quantity;
+
+    }, 0);
+
+    const availableDiscount = walletDiscount + spinDiscount;
+
+    const discount = Math.min(subtotal, availableDiscount);
+
+    const finalTotal = subtotal - discount;
+
+    const confirmed = confirm(
+
+        `Order Summary\n\n` +
+        `Subtotal: ₹${subtotal}\n` +
+        `Discount: ₹${discount}\n` +
+        `Final Total: ₹${finalTotal}\n\n` +
+        `Place this demo order?`
+
+    );
+
+    if (!confirmed) return;
+
+
+    // Earn 10 points for every ₹100 spent.
+
+    const earnedPoints = Math.floor(finalTotal / 100) * 10;
+
+    rewardPoints += earnedPoints;
+
+    // Consume discounts.
+
+    let remainingDiscount = discount;
+
+    const walletUsed = Math.min(walletDiscount, remainingDiscount);
+
+    walletDiscount -= walletUsed;
+
+    remainingDiscount -= walletUsed;
+
+    const spinUsed = Math.min(spinDiscount, remainingDiscount);
+
+    spinDiscount -= spinUsed;
+
+
+    cart = [];
+
+    updateCart();
+
+    updateRewards();
+
+    closeCart();
+
+    showToast(
+        `Order placed! You earned ${earnedPoints} Golden Points!`
+    );
+
+    alert(
+        `Thank you for ordering at The Golden Plate!\n\n` +
+        `Amount paid: ₹${finalTotal}\n` +
+        `Points earned: ${earnedPoints}\n` +
+        `Total rewards: ${rewardPoints}`
+    );
+
+});
+
+
+// 20. TABLE RESERVATION
+
+const reservationForm =
+    document.getElementById("reservationForm");
+
+const bookingDate =
+    document.getElementById("bookingDate");
+
+
+function getLocalDate() {
+
+    const date = new Date();
+
+    return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0"),
+        String(date.getDate()).padStart(2, "0")
+    ].join("-");
+
+}
+
+const localToday = getLocalDate();
+
+bookingDate.min = localToday;
+
+reservationForm.addEventListener("submit", async event => {
+
+    event.preventDefault();
+
+    const name =
+        document.getElementById("customerName").value.trim();
+
+    const email =
+        document.getElementById("customerEmail").value.trim();
+
+    const date = bookingDate.value;
+
+    const time =
+        document.getElementById("bookingTime").value;
+
+    const guests =
+        document.getElementById("guests").value;
+
+    if (date < getLocalDate()) {
+        showToast("Please select a valid date!");
+        return;
+    }
+
+    try {
+
+        const response = await fetch(API_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "reservation",
+                name: name,
+                email: email,
+                bookingDate: date,
+                bookingTime: time,
+                guests: guests
+            })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.message);
+        }
+
+        alert(
+            `Reservation Confirmed!\n\n` +
+            `Reservation ID: ${result.reservationId}\n` +
+            `Name: ${name}\n` +
+            `Date: ${date}\n` +
+            `Time: ${time}\n` +
+            `Guests: ${guests}`
+        );
+
+        reservationForm.reset();
+        showToast("Reservation saved successfully!");
+
+    } catch (error) {
+
+        console.error("Reservation Error:", error);
+        showToast("Reservation failed. Please try again.");
+
+    }
+
+});
+
+
+// 21. BACK TO TOP
+
+window.addEventListener("scroll", () => {
+
+    if (window.scrollY > 300) {
+
+        backToTop.classList.add("show");
+
+    } else {
+
+        backToTop.classList.remove("show");
+
+    }
+
+});
+
+
+backToTop.addEventListener("click", () => {
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+});
+
+
+// 22. INITIAL SETUP
+
+updateCart();
+
+updateRewards();
+
+checkSpinStatus();
+
+console.log("The Golden Plate - All Features Loaded!");
+
+// ==========================================
+// 23. GOOGLE SHEETS API
+// ==========================================
+
+const API_URL = "https://script.google.com/macros/s/AKfycbwSD5RHqPh1duYM7SNKnz-6tv1wr2keTDcHURdOxxTF4PzT6hEC-zqECMQQOtpPtjmbhQ/exec";
+
+async function loadMenu() {
+    try {
+        const response = await fetch(`${API_URL}?action=menu`);
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error("Menu loading failed");
+        }
+
+        console.log("Menu loaded:", result.menu);
+
+    } catch (error) {
+        console.error("API Error:", error);
+    }
+}
+
+loadMenu();
